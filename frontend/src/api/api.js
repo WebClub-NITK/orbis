@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Create axios instance with default config
-const api = axios.create({
+export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true,
   headers: {
@@ -39,7 +39,7 @@ export const authAPI = {
    * Get current authenticated user
    * @returns {Promise} Response with user data
    */
-  getCurrentUser: () => 
+  getCurrentUser: () =>
     api.get('/api/user')
 };
 

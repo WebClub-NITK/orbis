@@ -1,3 +1,5 @@
+import {auth} from "express-oauth2-jwt-bearer";
+
 /**
  * Middleware to check if user is authenticated
  */
@@ -8,6 +10,11 @@ export const authenticateUser = (req, res, next) => {
     res.status(401).json({ error: 'Unauthorized' });
   }
 };
+
+export const checkJwt = auth({
+  audience: 'https://myidentifer',
+  issuerBaseURL: `https://dev-qiuv6qbqd6kdpwtr.us.auth0.com/`,
+});
 
 /**
  * Middleware to check if user is an organizer

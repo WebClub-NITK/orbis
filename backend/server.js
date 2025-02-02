@@ -6,6 +6,7 @@ import sessionConfig from './src/config/session.js';
 import errorHandler from './src/middleware/error.js';
 import prisma from './src/config/database.js';
 
+
 // Import routes
 import authRoutes from './src/routes/auth.js';
 import eventRoutes from './src/routes/events.js';
@@ -15,6 +16,8 @@ import profileRoutes from './src/routes/profiles.js';
 
 const app = express();
 const PORT = process.env.PORT || 4000;
+
+
 
 // Middleware
 app.use(cors({

@@ -6,16 +6,18 @@ import prisma from '../config/database.js';
  */
 export const register = async (req, res) => {
   try {
-    const { email, username, password, role } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const { email, username, role } = req.body;
+    const auth = req.auth;
+    console.log(auth);
+    // const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await prisma.user.create({
       data: {
+        id: auth.payload.sub,
         email,
         username,
-        passwordHash: hashedPassword,
         role: role.toUpperCase(),
-        status: 'ACTIVE'
+        status: 'ACTIVE',
       },
     });
 
@@ -45,15 +47,12 @@ export const register = async (req, res) => {
  * Login user
  */
 export const login = async (req, res) => {
-  const { email, password } = req.body;
+  const auth = req.auth;
 
   const user = await prisma.user.findUnique({ 
-    where: { email } 
+    where: { id: auth.payload.sub }
   });
 
-  if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
-    return res.status(401).json({ error: 'Invalid credentials' });
-  }
 
   req.session.userId = user.id;
   req.session.userRole = user.role;
@@ -87,14 +86,29 @@ export const logout = (req, res) => {
  * Get current user
  */
 export const getCurrentUser = async (req, res) => {
-  const user = await prisma.user.findUnique({
-    where: { id: req.session.userId },
-    select: { 
-      id: true, 
-      email: true, 
-      username: true, 
-      role: true 
+  try{
+    const auth = req.auth;
+    const id = auth.payload.sub;
+    const user = await prisma.user.findUnique({
+      where: {id: id},
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        role: true
+      }
+    });
+
+    if(!user){
+      return res.status(404).json({
+        error: 'Could not find user'
+      })
+
     }
-  });
-  res.json(user);
+    res.status(200).json(user);
+  }catch (e) {
+    res.status(404).json({
+      error: 'Could not find user'
+    })
+  }
 }; 

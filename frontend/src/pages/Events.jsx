@@ -2,17 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useAuth } from '../contexts/AuthContext';
+// import { useAuth } from '../contexts/AuthContext';
 import Button from '../components/Button';
 import { EditBtn } from '../svg/EditBtn';
 import { DeleteBtn } from '../svg/DeleteBtn';
 import AlertDialog from '../components/AlertDialog';
 import { deleteImage } from '../helpers/images';
+import {useAuth0} from "@auth0/auth0-react";
 
 
 const Events = () => {
   const [events, setEvents] = useState([]);
-  const { user } = useAuth();
+  const { user } = useAuth0();
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [applicationResponses, setApplicationResponses] = useState({});
   const navigate = useNavigate();

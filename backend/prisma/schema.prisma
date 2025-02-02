@@ -8,10 +8,9 @@ datasource db {
 }
 
 model User {
-  id             Int                 @id @default(autoincrement())
+  id             String                 @id
   email          String              @unique
   username       String              @unique
-  passwordHash   String
   role           UserRole
   status         UserStatus
   createdAt      DateTime            @default(now())
@@ -28,7 +27,7 @@ model User {
 
 model UserProfile {
   id        Int      @id @default(autoincrement())
-  userId    Int      @unique
+  userId    String      @unique
   firstName String?
   lastName  String?
   avatarUrl String?
@@ -44,7 +43,7 @@ model UserProfile {
 
 model UserEducation {
   id              Int        @id @default(autoincrement())
-  userId          Int
+  userId          String
   institutionName String
   degree          DegreeType
   fieldOfStudy    String
@@ -55,7 +54,7 @@ model UserEducation {
 
 model UserExperience {
   id          Int       @id @default(autoincrement())
-  userId      Int
+  userId      String
   company     String
   position    String
   startDate   DateTime
@@ -68,7 +67,7 @@ model UserExperience {
 
 model UserSkill {
   id             Int            @id @default(autoincrement())
-  userId         Int
+  userId         String
   skillName      String
   expertiseLevel ExpertiseLevel
   user           User           @relation(fields: [userId], references: [id])
@@ -76,7 +75,7 @@ model UserSkill {
 
 model UserSocialProfile {
   id       Int            @id @default(autoincrement())
-  userId   Int
+  userId   String
   platform SocialPlatform
   url      String
   user     User           @relation(fields: [userId], references: [id])
@@ -92,7 +91,7 @@ model Event {
   minTeamSize       Int?
   maxTeamSize       Int?
   createdAt         DateTime            @default(now())
-  createdById       Int
+  createdById       String
   mode              EventMode           @default(ONLINE)
   status            EventStatus         @default(DRAFT)
   applications      Application[]
@@ -151,7 +150,7 @@ model CustomQuestion {
 model Application {
   id         Int               @id @default(autoincrement())
   eventId    Int
-  userId     Int
+  userId     String
   teamId     Int?
   status     ApplicationStatus
   rsvpStatus RSVPStatus
@@ -184,7 +183,7 @@ model EventBranding {
   coverImage   Image?   @relation("coverImage", fields: [coverImageId], references: [id], onDelete: Cascade)
   faviconImage Image?   @relation("faviconImage", fields: [faviconImageId], references: [id], onDelete: Cascade)
   logoImage    Image?   @relation("logoImage", fields: [logoImageId], references: [id], onDelete: Cascade)
-  
+
 }
 
 model EventTimeline {
@@ -274,7 +273,7 @@ model Team {
 model TeamMember {
   id     Int            @id @default(autoincrement())
   teamId Int
-  userId Int
+  userId String
   role   TeamMemberRole
   team   Team           @relation(fields: [teamId], references: [id])
   user   User           @relation(fields: [userId], references: [id])
@@ -294,7 +293,7 @@ model ProjectSubmission {
 }
 
 model Image {
-  id        Int      @id @default(autoincrement()) 
+  id        Int      @id @default(autoincrement())
   filePath  String?
   bucket    String?
   publicUrl String?

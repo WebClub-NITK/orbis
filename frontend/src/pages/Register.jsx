@@ -1,21 +1,28 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import {useNavigate, Link, Navigate} from 'react-router-dom';
+import { authAPI } from '../api/api.js';
 import Button from '../components/Button';
+import { useAuth0 } from "@auth0/auth0-react";
 
 const Register = () => {
-  const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('PARTICIPANT');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { register } = useAuth();
+  const { user, isAuthenticated } = useAuth0();
+  const [email, setEmail] = useState(user.email);
+  // const { register } = useAuth();
+
+  //If user is not logged in using auth0, restrict the user to access the page
+  // if(!isAuthenticated){
+  //   return <Navigate to={'/'} replace/>;
+  // }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await register(email, username, password, role);
+      await authAPI.register({email, username, role});
       navigate('/');
     } catch (error) {
       setError(error.response?.data?.error || 'Failed to register');
@@ -61,11 +68,12 @@ const Register = () => {
             <input
               type="email"
               id="email"
-              value={email}
+              value={user.email}
               onChange={(e) => setEmail(e.target.value)}
               required
               className={inputClasses}
               placeholder="your.email@nitk.edu.in"
+              disabled
             />
           </div>
 
@@ -82,18 +90,18 @@ const Register = () => {
             />
           </div>
 
-          <div>
-            <label htmlFor="password" className={labelClasses}>Password</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className={inputClasses}
-              placeholder="Create a strong password"
-            />
-          </div>
+          {/*<div>*/}
+          {/*  <label htmlFor="password" className={labelClasses}>Password</label>*/}
+          {/*  <input*/}
+          {/*    type="password"*/}
+          {/*    id="password"*/}
+          {/*    value={password}*/}
+          {/*    onChange={(e) => setPassword(e.target.value)}*/}
+          {/*    required*/}
+          {/*    className={inputClasses}*/}
+          {/*    placeholder="Create a strong password"*/}
+          {/*  />*/}
+          {/*</div>*/}
 
           <div>
             <label htmlFor="role" className={labelClasses}>I want to</label>

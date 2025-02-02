@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useAuth } from '../contexts/AuthContext';
+// import { useAuth } from '../contexts/AuthContext';
+import { useAuth0 } from "@auth0/auth0-react";
 import Button from '../components/Button';
 
 const Profile = () => {
-  const { user } = useAuth();
+  const { user } = useAuth0();
   const [profile, setProfile] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -23,7 +24,8 @@ const Profile = () => {
   const fetchProfile = async () => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/profile`, { withCredentials: true });
-      setProfile(response.data);
+      // const response = { data: {}}
+      setProfile(user);
       setFormData({
         profile: response.data.profile || {},
         education: response.data.education || [],
@@ -51,7 +53,7 @@ const Profile = () => {
   };
 
   const handleSubmit = async (e) => {
-    
+
     e.preventDefault();
     try {
       console.log(formData);
@@ -95,9 +97,9 @@ const Profile = () => {
 
   return (
     <>
-      
+
       <div className="flex justify-center items-center min-h-screen bg-white px-4">
-        
+
       {isEditing ? (
         <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-4xl bg-white shadow-xl border-t-black border-solid border-4 rounded-2xl p-12 mt-20 mb-20">
           {/* Basic Information */}
@@ -318,7 +320,7 @@ const Profile = () => {
           </Button>
         </form>
       ) : (
-        
+
         <div className="w-full max-w-4xl bg-white shadow-xl border-t-black border-solid border-4 rounded-2xl p-8 mt-20 mb-20">
           <div className="flex mb-6">
             <div className="w-32 h-32 rounded-full bg-gray-300 flex items-center justify-center text-3xl font-bold text-gray-500">
@@ -330,7 +332,7 @@ const Profile = () => {
             <p className=' font-medium text-md'>{user.email}</p>
             <p className='bg-gray-200 rounded text-sm p-2 mt-2'>{renderField(profile.profile?.bio)}</p>
           </div>
-          
+
 
                   <h3 className="text-xl font-semibold mt-6 mb-3">Education</h3>
         {profile.education?.map((edu, index) => (
@@ -370,11 +372,11 @@ const Profile = () => {
             Edit Profile
           </Button>
         </div>
-      
+
       )}
       </div>
     </>
-    
+
   );
 };
 

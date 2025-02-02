@@ -5,6 +5,8 @@ import prisma from '../config/database.js';
  */
 export const getProfile = async (req, res) => {
   try {
+    // const auth = req.auth;
+    // console.log(auth);
     const profile = await prisma.user.findUnique({
       where: { id: req.session.userId },
       include: {
