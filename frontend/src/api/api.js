@@ -43,9 +43,65 @@ export const authAPI = {
     return response.data;
   },
 
-  async updateUser(userData) {
-    const response = await api.put('/api/auth/user', userData);
-    return response.data;
+  updateUser: async (userData) => {
+    try {
+      console.log('Sending update request with data:', userData);
+      const token = localStorage.getItem('auth0_token');
+
+      // Format the education dates if they exist
+      if (userData.education) {
+        userData.education = userData.education.map(edu => ({
+          ...edu,
+          startDate: edu.startDate ? new Date(edu.startDate).toISOString() : null,
+          endDate: edu.endDate ? new Date(edu.endDate).toISOString() : null
+        }));
+      }
+
+      // Remove id, createdAt, updatedAt from profile data
+      const { id, createdAt, updatedAt, userId, ...profileData } = userData.profile || {};
+
+      // Structure the data to match Prisma schema
+      const formattedData = {
+        profile: {
+          upsert: {
+            create: profileData,
+            update: profileData
+          }
+        },
+        education: {
+          deleteMany: {},
+          create: userData.education || []
+        },
+        skills: {
+          deleteMany: {},
+          create: userData.skills || []
+        },
+        experience: {
+          deleteMany: {},
+          create: userData.experience || []
+        },
+        socialProfiles: {
+          deleteMany: {},
+          create: userData.socialProfiles || []
+        }
+      };
+
+      const response = await api.put(
+        '/api/auth/user',
+        formattedData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          withCredentials: true
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('API Error:', error.response?.data || error);
+      throw error;
+    }
   },
 
   /**

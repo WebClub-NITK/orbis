@@ -344,57 +344,57 @@ export const deleteEvent = async (req, res) => {
       return res.status(403).json({ error: 'Not authorized to delete this event' });
     }
 
-    // Delete all related records and the event itself
-    await prisma.$transaction([
+    // Delete the event and all related records
+    await prisma.$transaction(async (tx) => {
       // Delete applications first
-      prisma.application.deleteMany({
+      await tx.application.deleteMany({
         where: { eventId: parseInt(id) }
-      }),
+      });
 
       // Delete prizes
-      prisma.prize.deleteMany({
+      await tx.prize.deleteMany({
         where: {
-          track: {
-            eventId: parseInt(id)
+          trackId: {
+            in: event.tracks.map(track => track.id)
           }
         }
-      }),
+      });
 
       // Delete tracks
-      prisma.track.deleteMany({
+      await tx.track.deleteMany({
         where: { eventId: parseInt(id) }
-      }),
+      });
 
       // Delete timeline
-      prisma.timeline.deleteMany({
+      await tx.timeline.delete({
         where: { eventId: parseInt(id) }
-      }),
+      });
 
       // Delete branding
-      prisma.branding.deleteMany({
+      await tx.branding.delete({
         where: { eventId: parseInt(id) }
-      }),
+      });
 
       // Delete links
-      prisma.link.deleteMany({
+      await tx.link.delete({
         where: { eventId: parseInt(id) }
-      }),
+      });
 
       // Delete sponsors
-      prisma.sponsor.deleteMany({
+      await tx.sponsor.deleteMany({
         where: { eventId: parseInt(id) }
-      }),
+      });
 
       // Delete event people
-      prisma.eventPerson.deleteMany({
+      await tx.eventPerson.deleteMany({
         where: { eventId: parseInt(id) }
-      }),
+      });
 
       // Finally delete the event
-      prisma.event.delete({
+      await tx.event.delete({
         where: { id: parseInt(id) }
-      })
-    ]);
+      });
+    });
 
     res.json({ message: 'Event deleted successfully' });
   } catch (error) {

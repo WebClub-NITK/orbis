@@ -259,19 +259,22 @@ const Events = () => {
           {events.map((event) => (
             <div
               key={event.id}
-              className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer"
+              className="bg-white rounded-lg shadow-md overflow-hidden"
             >
-              {event.branding?.coverUrl && (
-                <img
-                  src={event.branding.coverUrl}
-                  alt={event.name}
-                  className="w-full h-48 object-cover"
-                  onClick={() => handleEventViewClick(event.id)}
-                />
-              )}
-              <div className="p-4">
-                <h2 className="text-xl font-semibold mb-2">{event.name}</h2>
-                <p className="text-gray-600 mb-2">{event.tagline}</p>
+              <div onClick={() => handleEventViewClick(event.id)}>
+                {event.branding?.coverUrl && (
+                  <img
+                    src={event.branding.coverUrl}
+                    alt={event.name}
+                    className="w-full h-48 object-cover"
+                  />
+                )}
+                <div className="p-4">
+                  <h2 className="text-xl font-semibold mb-2">{event.name}</h2>
+                  <p className="text-gray-600 mb-2">{event.tagline}</p>
+                </div>
+              </div>
+              <div className="p-4 border-t">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-500">
                     {new Date(event.timeline.eventStart).toLocaleDateString()}
@@ -282,22 +285,28 @@ const Events = () => {
                     }`}>
                       {event.status}
                     </span>
-                    {event.createdById === user?.id && (
+                    {event.createdById === user?.id ? (
                       <>
                         <button
-                          onClick={() => handleEventEditClick(event.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEventEditClick(event.id);
+                          }}
                           className="p-2 hover:bg-gray-100 rounded-full"
                         >
                           <EditBtn />
                         </button>
                         <button
-                          onClick={() => handleDeleteClick(event)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteClick(event);
+                          }}
                           className="p-2 hover:bg-gray-100 rounded-full"
                         >
                           <DeleteBtn />
                         </button>
                       </>
-                    )}
+                    ) : null}
                   </div>
                 </div>
               </div>

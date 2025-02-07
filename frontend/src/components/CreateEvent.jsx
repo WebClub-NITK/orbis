@@ -40,7 +40,8 @@ const CreateEvent = () => {
     },
     tracks: [],
     sponsors: [],
-    eventPeople: []
+    eventPeople: [],
+    customQuestions: []
   };
 
   const apiCall = async (payload) => {

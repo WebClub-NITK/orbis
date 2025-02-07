@@ -14,6 +14,7 @@ const EventForm = ({
   // This block of code stores the initalization of all the state variables (fields and entries) in the form
   const [formData, setFormData] = useState({
     ...localFormData,
+    customQuestions: localFormData.customQuestions || [],
     eventBranding: {
       ...localFormData.eventBranding,
       logo: null,  // Initialize as null
@@ -1228,7 +1229,7 @@ const EventForm = ({
             </label>
 
             {/*Custom Questions*/}
-            {formData.customQuestions?.map((question, index) => (
+            {(formData.customQuestions || []).map((question, index) => (
               <div key={index} className="border p-4 rounded mt-4">
                 <input
                   type="text"
@@ -1331,11 +1332,14 @@ const EventForm = ({
               onClick={() => {
                 const newQuestion = {
                   questionText: '',
-                  questionType: '',
+                  questionType: 'TEXT',
                   options: [],
                   isRequired: false,
                 };
-                setFormData({ ...formData, customQuestions: [...formData.customQuestions, newQuestion] });
+                setFormData(prev => ({
+                  ...prev,
+                  customQuestions: [...(prev.customQuestions || []), newQuestion]
+                }));
               }}
               className="mt-4 text-blue-500"
             >

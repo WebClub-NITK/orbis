@@ -16,70 +16,98 @@ model User {
   status         UserStatus       @default(ACTIVE)
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
-  profile        UserProfile?
-  education      UserEducation[]
-  experience     UserExperience[]
-  skills         UserSkill[]
-  socialProfiles UserSocialProfile[]
+  profile        Profile?
+  education      Education[]
+  experience     Experience[]
+  skills         Skill[]
+  socialProfiles SocialProfile[]
   applications   Application[]
   createdEvents  Event[]
   teamMembers    TeamMember[]
+  projects       Project[]
 }
 
-model UserProfile {
-  id        Int       @id @default(autoincrement())
-  userId    String    @unique
+model Profile {
+  id        Int      @id @default(autoincrement())
   firstName String?
   lastName  String?
   avatarUrl String?
-  bio       String?
-  gender    Gender?
+  bio       String?  @db.Text
+  gender    String?
   phone     String?
   country   String?
   city      String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model UserEducation {
-  id              Int       @id @default(autoincrement())
-  userId          String
+model Education {
+  id              Int      @id @default(autoincrement())
   institutionName String
   degree          String
   fieldOfStudy    String
   graduationYear  Int?
-  createdAt       DateTime  @default(now())
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  startDate       DateTime?
+  endDate         DateTime?
+  grade           String?
+  activities      String?  @db.Text
+  user            User     @relation(fields: [userId], references: [id])
+  userId          String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
-model UserExperience {
-  id          Int       @id @default(autoincrement())
-  userId      String
+model Experience {
+  id          Int      @id @default(autoincrement())
+  title       String
   company     String
-  position    String
+  location    String?
   startDate   DateTime
   endDate     DateTime?
-  current     Boolean   @default(false)
-  description String?
-  createdAt   DateTime  @default(now())
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  current     Boolean  @default(false)
+  description String?  @db.Text
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
-model UserSkill {
-  id             Int            @id @default(autoincrement())
-  userId         String
-  skillName      String
-  expertiseLevel ExpertiseLevel
-  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+model Skill {
+  id            Int      @id @default(autoincrement())
+  skillName     String
+  expertiseLevel String
+  yearsOfExp    Int?
+  user          User     @relation(fields: [userId], references: [id])
+  userId        String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
-model UserSocialProfile {
-  id       Int            @id @default(autoincrement())
-  userId   String
-  platform SocialPlatform
+model SocialProfile {
+  id       Int      @id @default(autoincrement())
+  platform String   // GITHUB, LINKEDIN, TWITTER, PORTFOLIO, etc.
   url      String
-  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id])
+  userId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Project {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?  @db.Text
+  url         String?
+  image       String?
+  startDate   DateTime?
+  endDate     DateTime?
+  technologies String[] // Array of technology names
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Event {

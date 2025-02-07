@@ -103,62 +103,36 @@ export const getCurrentUser = async (req, res) => {
 
 export const updateUser = async (req, res) => {
   try {
-    const userId = req.auth.payload.sub;
-    const userData = req.body;
+    const { profile, education, experience, skills, socialProfiles } = req.body;
+    const auth0Id = req.auth.payload.sub;
 
-    // Remove id and timestamps from profile data
-    const profileData = userData.profile ? {
-      firstName: userData.profile.firstName,
-      lastName: userData.profile.lastName,
-      avatarUrl: userData.profile.avatarUrl,
-      bio: userData.profile.bio,
-      gender: userData.profile.gender,
-      phone: userData.profile.phone,
-      country: userData.profile.country,
-      city: userData.profile.city
-    } : {};
-
+    console.log('Updating user with ID:', auth0Id);
+    
     const updatedUser = await prisma.user.update({
-      where: { auth0Id: userId },
+      where: { auth0Id },
       data: {
-        profile: {
+        profile: profile ? {
           upsert: {
-            create: profileData,
-            update: profileData
+            create: profile,
+            update: profile
           }
-        },
-        education: {
+        } : undefined,
+        education: education ? {
           deleteMany: {},
-          create: userData.education?.map(edu => ({
-            institutionName: edu.institutionName,
-            degree: edu.degree,
-            fieldOfStudy: edu.fieldOfStudy,
-            graduationYear: edu.graduationYear ? parseInt(edu.graduationYear) : null
-          })) || []
-        },
-        experience: {
+          create: education
+        } : undefined,
+        experience: experience ? {
           deleteMany: {},
-          create: userData.experience?.map(exp => ({
-            company: exp.company,
-            position: exp.position,
-            startDate: exp.startDate ? new Date(exp.startDate) : null,
-            endDate: exp.endDate ? new Date(exp.endDate) : null
-          })) || []
-        },
-        skills: {
+          create: experience
+        } : undefined,
+        skills: skills ? {
           deleteMany: {},
-          create: userData.skills?.map(skill => ({
-            skillName: skill.skillName,
-            expertiseLevel: skill.expertiseLevel
-          })) || []
-        },
-        socialProfiles: {
+          create: skills
+        } : undefined,
+        socialProfiles: socialProfiles ? {
           deleteMany: {},
-          create: userData.socialProfiles?.map(social => ({
-            platform: social.platform,
-            url: social.url
-          })) || []
-        }
+          create: socialProfiles
+        } : undefined
       },
       include: {
         profile: true,
@@ -172,6 +146,9 @@ export const updateUser = async (req, res) => {
     res.json(updatedUser);
   } catch (error) {
     console.error('Update user error:', error);
-    res.status(500).json({ error: 'Failed to update user' });
+    res.status(500).json({ 
+      error: 'Failed to update user',
+      details: error.message 
+    });
   }
-}; 
+};
